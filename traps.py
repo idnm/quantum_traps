@@ -32,7 +32,7 @@ class ExperimentOptions:
     keep_history: bool = False
 
     def __post_init__(self):
-        assert self.target_type in ['self_instance', 'random_instance', 'fixed_unitary']
+        assert self.target_type in ['self_instance', 'random_unitary', 'fixed_unitary']
         assert self.ansatz_type in ['cz', 'cx', 'cp']
 
 
@@ -120,6 +120,8 @@ class Experiment:
             results = dill.load(f)
 
         return results
+
+
 
 
 # def chart_success_ratio(target_type, ansatz_type, num_qubits, gate_counts, num_targets, num_samples, threshold_loss=1e-4, fixed_unitary=None):
