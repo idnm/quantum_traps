@@ -7,6 +7,8 @@ from collections import namedtuple
 from scipy.stats import unitary_group
 from typing import List
 
+from tqdm.auto import tqdm
+
 A = namedtuple('Angles', ['angles'])
 
 
@@ -64,8 +66,8 @@ class Experiment:
         self.results[num_gates, num_target] = result
 
     def run(self):
-        for num_gates in self.options.gate_counts:
-            for num_target in range(self.options.num_targets):
+        for num_gates in tqdm(self.options.gate_counts, desc='Gates'):
+            for num_target in tqdm(range(self.options.num_targets), desc='Targets'):
                 self.run_particular(num_gates, num_target)
         self.save()
 
