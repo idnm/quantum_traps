@@ -1,3 +1,5 @@
+import os.path
+
 from mynimize import *
 from cpflow import *
 from cpflow.matrix_utils import cost_HST
@@ -27,6 +29,7 @@ class ExperimentOptions:
     num_targets: int
     num_samples: int
     fixed_unitary: jnp.ndarray = None
+    keep_history: bool = False
 
     def __post_init__(self):
         assert self.target_type in ['self_instance', 'random_instance', 'fixed_unitary']
@@ -42,6 +45,8 @@ class Experiment:
         self.name = name
         self.results = {}
         self.path = f'results/experiment_{name}'
+        if os.path.exists(self.path):
+            print('WARNING: Experiment already exists and will be overwritten.')
 
     def run_particular(self, num_gates, num_target):
 
@@ -62,12 +67,14 @@ class Experiment:
         initial_angles = [A(angles) for angles in initial_angles]
         loss = lambda a: cost_HST(u_target, anz.unitary(a.angles))
 
-        result = mynimize(loss, initial_angles, OptOptions(num_iterations=2000, learning_rate=0.1, keep_history=False))
+        result = mynimize(loss, initial_angles, OptOptions(num_iterations=2000, learning_rate=0.1, keep_history=self.options.keep_history))
+        if not self.options.keep_history:
+            del result.all_results
         self.results[num_gates, num_target] = result
 
     def run(self):
         for num_gates in tqdm(self.options.gate_counts, desc='Gates'):
-            for num_target in tqdm(range(self.options.num_targets), desc='Targets'):
+            for num_target in tqdm(range(self.options.num_targets), desc='Targets', leave=False):
                 self.run_particular(num_gates, num_target)
         self.save()
 
@@ -102,12 +109,9 @@ class Experiment:
         plt.ylabel('Success Ratio')
         plt.xlabel('Number of 2q gates')
 
-    def save(self, path=None):
-        if path is None:
-            path = self.path
-
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, 'wb') as f:
+    def save(self):
+        os.makedirs(os.path.dirname(self.path), exist_ok=True)
+        with open(self.path, 'wb') as f:
             dill.dump(self, f)
 
     @staticmethod
