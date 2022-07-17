@@ -122,68 +122,6 @@ class Experiment:
         return results
 
 
-
-
-# def chart_success_ratio(target_type, ansatz_type, num_qubits, gate_counts, num_targets, num_samples, threshold_loss=1e-4, fixed_unitary=None):
-#     """Sweeps over gate counts and computes the success ratio for each.
-#
-#     Args:
-#         target_type: 'self_instance','random_unitary' or 'fixed_unitary'
-#         ansatz_type: 'cz', 'cx' or 'cp'
-#         num_qubits: number of qubits
-#         gate_counts: list of gate counts to sweep over
-#         num_targets: number of targets to use for each gate count (except for 'fixed_unitary')
-#         num_samples: number of samples to use for each target
-#         threshold_loss: threshold for success ratio
-#         fixed_unitary: unitary to use for 'fixed_unitary'
-#     Returns:
-#         A dictionary of gate counts to success ratios.
-#         Stores full training histories on a disk.
-#             """
-#
-#     key = random.PRNGKey(0)
-#
-#     success_ratios = {}
-#     for num_gates in gate_counts:
-#         success_ratios_at_num_gates = []
-#         for random_seed in range(num_targets):
-#             key, subkey = random.split(key)
-#             sr = success_ratio(target_type, ansatz_type, num_qubits, num_gates, num_samples, random_seed, threshold_loss, fixed_unitary)
-#             success_ratios_at_num_gates.append(sr)
-#         success_ratios[num_gates] = success_ratios_at_num_gates
-#
-#     return success_ratios
-#
-
-# def success_ratio(target_type, ansatz_type, num_qubits, num_gates, num_samples, random_seed, threshold_loss, fixed_unitary=None):
-#
-#     key, subkey = random.split(random.PRNGKey(random_seed))
-#
-#     anz = Ansatz(num_qubits, ansatz_type, fill_layers(connected_layer(num_qubits), num_gates))
-#     if target_type == 'self_instance':
-#         angles_target = random_angles(subkey, anz.num_angles)
-#         u_target = anz.unitary(angles_target)
-#         min_loss = 0
-#     elif target_type == 'random_unitary':
-#         u_target = unitary_group.rvs(2**num_qubits, random_state=random_seed)
-#         min_loss = None
-#     elif target_type == 'fixed_unitary':
-#         u_target = fixed_unitary
-#         min_loss = None
-#     else:
-#         raise ValueError('target_type must be one of "self_instance", "random_unitary", "fixed_unitary"')
-#
-#     key, subkey = random.split(key)
-#     initial_angles = random_angles(subkey, num_samples * anz.num_angles).reshape((num_samples, anz.num_angles))
-#     initial_angles = [A(angles) for angles in initial_angles]
-#     loss = lambda a: cost_HST(u_target, anz.unitary(a.angles))
-#
-#     result = mynimize(loss, initial_angles, OptOptions(num_iterations=2000, learning_rate=0.1))
-#     result.save('results/%s_%s_%dq/depth%d_target%d' % (target_type, ansatz_type, num_qubits, num_gates, random_seed))
-#     best_losses = jnp.array(result.all_best_losses)
-#     return success_ratio_from_losses(best_losses, threshold_loss, min_loss)
-
-
 def hard_removal(anz, angles, num_angle, minimizer):
     """
     Sets angle 'num_angle' to zero and attempts to recover the original circuit.
