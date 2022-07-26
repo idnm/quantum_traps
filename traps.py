@@ -180,3 +180,13 @@ def soft_removal(anz, angles, num_angle, minimizer, r=1e-2):
     return loss_func(min_angles)
 
 
+# for ansatz_type in ['cz', 'cp']:
+#     options = ExperimentOptions(
+#         target_type='fixed_unitary',
+#         num_qubits=4,
+#         num_gd_iterations=5000,
+#         num_targets=1,
+#         fixed_unitary=jnp.identity(2**4)
+#     )
+#     experiment = Experiment(options, f'{ansatz_type}_id_4q_5000gd')
+#     experiment.run()
